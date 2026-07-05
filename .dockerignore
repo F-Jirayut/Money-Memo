@@ -1,0 +1,7 @@
+.dart_tool
+.git
+.idea
+.vscode
+build
+android/.gradle
+**/.DS_Store

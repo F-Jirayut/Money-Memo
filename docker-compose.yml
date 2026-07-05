@@ -1,0 +1,21 @@
+services:
+  flutter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+      - flutter-pub-cache:/home/flutter/.pub-cache
+      - flutter-gradle-cache:/home/flutter/.gradle
+    environment:
+      ANDROID_HOME: /opt/android-sdk-linux
+      ANDROID_SDK_ROOT: /opt/android-sdk-linux
+      GRADLE_USER_HOME: /home/flutter/.gradle
+      PUB_CACHE: /home/flutter/.pub-cache
+    tty: true
+    stdin_open: true
+
+volumes:
+  flutter-pub-cache:
+  flutter-gradle-cache:
