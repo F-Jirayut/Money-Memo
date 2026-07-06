@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/formatters.dart';
-import '../../core/providers.dart';
+import '../transactions/transaction_providers.dart';
 
 class ExportScreen extends ConsumerStatefulWidget {
   const ExportScreen({super.key});
@@ -27,10 +27,19 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Export CSV')),
+      appBar: AppBar(title: const Text('Import / Export')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          ListTile(
+            leading: const Icon(Icons.upload_file_outlined),
+            title: const Text('Import CSV'),
+            subtitle: const Text(
+              'รองรับ columns date,type,amount,category,wallet,note',
+            ),
+            onTap: _busy ? null : _import,
+          ),
+          const Divider(),
           ListTile(
             leading: const Icon(Icons.date_range),
             title: const Text('วันที่เริ่มต้น'),
@@ -46,10 +55,26 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
           const SizedBox(height: 16),
           FilledButton.icon(
             icon: _busy
-                ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
                 : const Icon(Icons.ios_share),
             label: const Text('Export และ Share CSV'),
             onPressed: _busy ? null : _export,
+          ),
+          const SizedBox(height: 10),
+          OutlinedButton.icon(
+            icon: const Icon(Icons.table_chart_outlined),
+            label: const Text('Export และ Share Excel'),
+            onPressed: _busy ? null : _exportExcel,
+          ),
+          const SizedBox(height: 10),
+          OutlinedButton.icon(
+            icon: const Icon(Icons.picture_as_pdf_outlined),
+            label: const Text('Export และ Share PDF'),
+            onPressed: _busy ? null : _exportPdf,
           ),
         ],
       ),
@@ -77,9 +102,42 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
   Future<void> _export() async {
     setState(() => _busy = true);
     try {
-      final repo = ref.read(repositoryProvider);
-      final file = await repo.exportCsv(_start, _end);
-      await repo.shareFile(file, 'Money Memo CSV');
+      await ref.read(dataExchangeViewModelProvider).exportCsv(_start, _end);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _exportExcel() async {
+    setState(() => _busy = true);
+    try {
+      await ref.read(dataExchangeViewModelProvider).exportExcel(_start, _end);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _exportPdf() async {
+    setState(() => _busy = true);
+    try {
+      await ref.read(dataExchangeViewModelProvider).exportPdf(_start, _end);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _import() async {
+    setState(() => _busy = true);
+    try {
+      final result = await ref.read(dataExchangeViewModelProvider).importCsv();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Import สำเร็จ ${result.importedCount} รายการ, ข้าม ${result.skippedCount} รายการ',
+          ),
+        ),
+      );
     } finally {
       if (mounted) setState(() => _busy = false);
     }

@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/formatters.dart';
 import '../../core/models.dart';
-import '../../core/providers.dart';
 import '../../shared/app_cards.dart';
 import '../transactions/transaction_providers.dart';
 
@@ -37,7 +36,7 @@ class WalletsScreen extends ConsumerWidget {
               ),
             );
           },
-          separatorBuilder: (_, __) => const Divider(height: 1),
+          separatorBuilder: (_, _) => const Divider(height: 1),
           itemCount: items.length,
         ),
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -46,32 +45,49 @@ class WalletsScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _edit(BuildContext context, WidgetRef ref, [Wallet? item]) async {
+  Future<void> _edit(
+    BuildContext context,
+    WidgetRef ref, [
+    Wallet? item,
+  ]) async {
     final name = TextEditingController(text: item?.name ?? '');
     final ok = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(item == null ? 'เพิ่มกระเป๋า' : 'แก้ไขกระเป๋า'),
-        content: TextField(controller: name, decoration: const InputDecoration(labelText: 'ชื่อกระเป๋า')),
+        content: TextField(
+          controller: name,
+          decoration: const InputDecoration(labelText: 'ชื่อกระเป๋า'),
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('ยกเลิก')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('บันทึก')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('ยกเลิก'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('บันทึก'),
+          ),
         ],
       ),
     );
     if (ok == true && name.text.trim().isNotEmpty) {
-      await ref.read(repositoryProvider).saveWallet(id: item?.id, name: name.text.trim());
-      ref.read(refreshProvider.notifier).state++;
+      await ref
+          .read(walletViewModelProvider)
+          .save(id: item?.id, name: name.text.trim());
     }
   }
 
   Future<void> _delete(BuildContext context, WidgetRef ref, int id) async {
     try {
-      await ref.read(repositoryProvider).deleteWallet(id);
-      ref.read(refreshProvider.notifier).state++;
+      await ref.read(walletViewModelProvider).delete(id);
     } catch (_) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('ลบไม่ได้ เพราะมีรายการใช้กระเป๋านี้อยู่')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('ลบไม่ได้ เพราะมีรายการใช้กระเป๋านี้อยู่'),
+          ),
+        );
       }
     }
   }

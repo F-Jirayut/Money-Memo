@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/formatters.dart';
 import '../../core/models.dart';
-import '../../core/providers.dart';
 import '../../shared/app_cards.dart';
 import 'transaction_form.dart';
 import 'transaction_providers.dart';
@@ -44,31 +43,65 @@ class TransactionsScreen extends ConsumerWidget {
                   hint: const Text('ทุกประเภท'),
                   items: const [
                     DropdownMenuItem(value: null, child: Text('ทุกประเภท')),
-                    DropdownMenuItem(value: TransactionType.income, child: Text('รายรับ')),
-                    DropdownMenuItem(value: TransactionType.expense, child: Text('รายจ่าย')),
+                    DropdownMenuItem(
+                      value: TransactionType.income,
+                      child: Text('รายรับ'),
+                    ),
+                    DropdownMenuItem(
+                      value: TransactionType.expense,
+                      child: Text('รายจ่าย'),
+                    ),
                   ],
-                  onChanged: (value) => ref.read(transactionFilterProvider.notifier).state =
-                      filter.copyWith(type: value, clearType: value == null),
+                  onChanged: (value) =>
+                      ref
+                          .read(transactionFilterProvider.notifier)
+                          .state = filter.copyWith(
+                        type: value,
+                        clearType: value == null,
+                      ),
                 ),
                 DropdownButton<int?>(
                   value: filter.categoryId,
                   hint: const Text('ทุกหมวด'),
                   items: [
                     const DropdownMenuItem(value: null, child: Text('ทุกหมวด')),
-                    ...categories.map((item) => DropdownMenuItem(value: item.id, child: Text(item.name))),
+                    ...categories.map(
+                      (item) => DropdownMenuItem(
+                        value: item.id,
+                        child: Text(item.name),
+                      ),
+                    ),
                   ],
-                  onChanged: (value) => ref.read(transactionFilterProvider.notifier).state =
-                      filter.copyWith(categoryId: value, clearCategory: value == null),
+                  onChanged: (value) =>
+                      ref
+                          .read(transactionFilterProvider.notifier)
+                          .state = filter.copyWith(
+                        categoryId: value,
+                        clearCategory: value == null,
+                      ),
                 ),
                 DropdownButton<int?>(
                   value: filter.walletId,
                   hint: const Text('ทุกกระเป๋า'),
                   items: [
-                    const DropdownMenuItem(value: null, child: Text('ทุกกระเป๋า')),
-                    ...wallets.map((item) => DropdownMenuItem(value: item.id, child: Text(item.name))),
+                    const DropdownMenuItem(
+                      value: null,
+                      child: Text('ทุกกระเป๋า'),
+                    ),
+                    ...wallets.map(
+                      (item) => DropdownMenuItem(
+                        value: item.id,
+                        child: Text(item.name),
+                      ),
+                    ),
                   ],
-                  onChanged: (value) => ref.read(transactionFilterProvider.notifier).state =
-                      filter.copyWith(walletId: value, clearWallet: value == null),
+                  onChanged: (value) =>
+                      ref
+                          .read(transactionFilterProvider.notifier)
+                          .state = filter.copyWith(
+                        walletId: value,
+                        clearWallet: value == null,
+                      ),
                 ),
               ],
             ),
@@ -76,8 +109,13 @@ class TransactionsScreen extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: TextField(
-              decoration: const InputDecoration(prefixIcon: Icon(Icons.search), hintText: 'ค้นหาจากหมายเหตุ'),
-              onChanged: (value) => ref.read(transactionFilterProvider.notifier).state = filter.copyWith(search: value),
+              decoration: const InputDecoration(
+                prefixIcon: Icon(Icons.search),
+                hintText: 'ค้นหาจากหมายเหตุ',
+              ),
+              onChanged: (value) =>
+                  ref.read(transactionFilterProvider.notifier).state = filter
+                      .copyWith(search: value),
             ),
           ),
           const SizedBox(height: 8),
@@ -88,7 +126,7 @@ class TransactionsScreen extends ConsumerWidget {
                   : ListView.separated(
                       padding: const EdgeInsets.fromLTRB(12, 0, 12, 88),
                       itemCount: items.length,
-                      separatorBuilder: (_, __) => const Divider(height: 1),
+                      separatorBuilder: (_, _) => const Divider(height: 1),
                       itemBuilder: (context, index) => TransactionTile(
                         transaction: items[index],
                         onTap: () => _openForm(context, items[index]),
@@ -104,7 +142,11 @@ class TransactionsScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _pickMonth(BuildContext context, WidgetRef ref, DateTime current) async {
+  Future<void> _pickMonth(
+    BuildContext context,
+    WidgetRef ref,
+    DateTime current,
+  ) async {
     final picked = await showDatePicker(
       context: context,
       initialDate: current,
@@ -113,8 +155,13 @@ class TransactionsScreen extends ConsumerWidget {
       locale: const Locale('th', 'TH'),
     );
     if (picked != null) {
-      ref.read(transactionFilterProvider.notifier).state =
-          ref.read(transactionFilterProvider).copyWith(month: DateTime(picked.year, picked.month));
+      ref
+          .read(transactionViewModelProvider)
+          .setFilter(
+            ref
+                .read(transactionFilterProvider)
+                .copyWith(month: DateTime(picked.year, picked.month)),
+          );
     }
   }
 
@@ -133,13 +180,18 @@ class TransactionsScreen extends ConsumerWidget {
         title: const Text('ลบรายการ'),
         content: const Text('ยืนยันการลบรายการนี้?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('ยกเลิก')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('ลบ')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('ยกเลิก'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('ลบ'),
+          ),
         ],
       ),
     );
     if (ok != true) return;
-    await ref.read(repositoryProvider).deleteTransaction(id);
-    ref.read(refreshProvider.notifier).state++;
+    await ref.read(transactionViewModelProvider).delete(id);
   }
 }

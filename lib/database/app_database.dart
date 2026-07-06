@@ -46,14 +46,82 @@ class AppDatabase extends GeneratedDatabase {
         category_id INTEGER NOT NULL,
         wallet_id INTEGER NOT NULL,
         note TEXT NOT NULL DEFAULT '',
+        receipt_path TEXT NOT NULL DEFAULT '',
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL,
         FOREIGN KEY(category_id) REFERENCES categories(id) ON DELETE RESTRICT,
         FOREIGN KEY(wallet_id) REFERENCES wallets(id) ON DELETE RESTRICT
       )
     ''');
+    await customStatement('''
+      CREATE TABLE IF NOT EXISTS budgets (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        month TEXT NOT NULL,
+        category_id INTEGER NOT NULL,
+        limit_cents INTEGER NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        UNIQUE(month, category_id),
+        FOREIGN KEY(category_id) REFERENCES categories(id) ON DELETE CASCADE
+      )
+    ''');
+    await customStatement('''
+      CREATE TABLE IF NOT EXISTS tags (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL UNIQUE,
+        color_value INTEGER NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      )
+    ''');
+    await customStatement('''
+      CREATE TABLE IF NOT EXISTS transaction_tags (
+        transaction_id INTEGER NOT NULL,
+        tag_id INTEGER NOT NULL,
+        PRIMARY KEY(transaction_id, tag_id),
+        FOREIGN KEY(transaction_id) REFERENCES transactions(id) ON DELETE CASCADE,
+        FOREIGN KEY(tag_id) REFERENCES tags(id) ON DELETE CASCADE
+      )
+    ''');
+    await customStatement('''
+      CREATE TABLE IF NOT EXISTS app_settings (
+        key TEXT PRIMARY KEY,
+        value TEXT NOT NULL
+      )
+    ''');
+    await customStatement('''
+      CREATE TABLE IF NOT EXISTS recurring_transactions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        type TEXT NOT NULL CHECK(type IN ('income', 'expense')),
+        amount_cents INTEGER NOT NULL,
+        category_id INTEGER NOT NULL,
+        wallet_id INTEGER NOT NULL,
+        day_of_month INTEGER NOT NULL,
+        note TEXT NOT NULL DEFAULT '',
+        is_active INTEGER NOT NULL DEFAULT 1,
+        last_generated_month TEXT NOT NULL DEFAULT '',
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY(category_id) REFERENCES categories(id) ON DELETE RESTRICT,
+        FOREIGN KEY(wallet_id) REFERENCES wallets(id) ON DELETE RESTRICT
+      )
+    ''');
+    await _ensureTransactionReceiptColumn();
     await _seedDefaults();
     await recalculateWalletBalances();
+  }
+
+  Future<void> _ensureTransactionReceiptColumn() async {
+    final columns = await customSelect('PRAGMA table_info(transactions)').get();
+    final hasReceiptPath = columns.any(
+      (row) => row.read<String>('name') == 'receipt_path',
+    );
+    if (!hasReceiptPath) {
+      await customStatement(
+        "ALTER TABLE transactions ADD COLUMN receipt_path TEXT NOT NULL DEFAULT ''",
+      );
+    }
   }
 
   Future<void> _seedDefaults() async {

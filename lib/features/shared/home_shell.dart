@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../backup/backup_screen.dart';
+import '../budgets/budgets_screen.dart';
 import '../categories/categories_screen.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../export/export_screen.dart';
@@ -22,6 +23,7 @@ class _HomeShellState extends State<HomeShell> {
     DashboardScreen(),
     TransactionsScreen(),
     MonthlySummaryScreen(),
+    BudgetsScreen(),
     WalletsScreen(),
     CategoriesScreen(),
     ExportScreen(),
@@ -36,13 +38,41 @@ class _HomeShellState extends State<HomeShell> {
         selectedIndex: _index,
         onDestinationSelected: (value) => setState(() => _index = value),
         destinations: const [
-          NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'หน้าหลัก'),
-          NavigationDestination(icon: Icon(Icons.receipt_long_outlined), selectedIcon: Icon(Icons.receipt_long), label: 'รายการ'),
-          NavigationDestination(icon: Icon(Icons.pie_chart_outline), selectedIcon: Icon(Icons.pie_chart), label: 'สรุป'),
-          NavigationDestination(icon: Icon(Icons.account_balance_wallet_outlined), selectedIcon: Icon(Icons.account_balance_wallet), label: 'กระเป๋า'),
-          NavigationDestination(icon: Icon(Icons.category_outlined), selectedIcon: Icon(Icons.category), label: 'หมวด'),
-          NavigationDestination(icon: Icon(Icons.ios_share_outlined), selectedIcon: Icon(Icons.ios_share), label: 'CSV'),
-          NavigationDestination(icon: Icon(Icons.settings_backup_restore), label: 'Backup'),
+          NavigationDestination(
+            icon: Icon(Icons.home_outlined),
+            selectedIcon: Icon(Icons.home),
+            label: 'หน้าหลัก',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.receipt_long_outlined),
+            selectedIcon: Icon(Icons.receipt_long),
+            label: 'รายการ',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.pie_chart_outline),
+            selectedIcon: Icon(Icons.pie_chart),
+            label: 'สรุป',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.savings_outlined),
+            selectedIcon: Icon(Icons.savings),
+            label: 'Budget',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.account_balance_wallet_outlined),
+            selectedIcon: Icon(Icons.account_balance_wallet),
+            label: 'กระเป๋า',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.category_outlined),
+            selectedIcon: Icon(Icons.category),
+            label: 'หมวด',
+          ),
+          NavigationDestination(icon: Icon(Icons.swap_vert), label: 'CSV'),
+          NavigationDestination(
+            icon: Icon(Icons.settings_backup_restore),
+            label: 'ตั้งค่า',
+          ),
         ],
       ),
     );

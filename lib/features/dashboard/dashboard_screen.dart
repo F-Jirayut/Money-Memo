@@ -42,7 +42,7 @@ class DashboardScreen extends ConsumerWidget {
                     title: 'รายรับเดือนนี้',
                     value: moneyText(data.monthIncomeCents),
                     icon: Icons.trending_up,
-                    color: Colors.teal.shade700,
+                    color: Theme.of(context).colorScheme.secondary,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -51,21 +51,77 @@ class DashboardScreen extends ConsumerWidget {
                     title: 'รายจ่ายเดือนนี้',
                     value: moneyText(data.monthExpenseCents),
                     icon: Icons.trending_down,
-                    color: Colors.red.shade700,
+                    color: Theme.of(context).colorScheme.error,
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 18),
-            Text('รายการล่าสุด', style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              'รายการล่าสุด',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
             const SizedBox(height: 8),
             Card(
               child: data.latestTransactions.isEmpty
-                  ? const SizedBox(height: 140, child: EmptyState(message: 'ยังไม่มีรายการ'))
+                  ? const SizedBox(
+                      height: 140,
+                      child: EmptyState(message: 'ยังไม่มีรายการ'),
+                    )
                   : Column(
                       children: data.latestTransactions
                           .map((tx) => TransactionTile(transaction: tx))
                           .toList(),
+                    ),
+            ),
+            const SizedBox(height: 18),
+            Text(
+              'รายจ่ายตามหมวด',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
+            Card(
+              child: data.expenseByCategory.isEmpty
+                  ? const SizedBox(
+                      height: 120,
+                      child: EmptyState(message: 'ยังไม่มีรายจ่ายเดือนนี้'),
+                    )
+                  : Padding(
+                      padding: const EdgeInsets.all(14),
+                      child: Column(
+                        children: data.expenseByCategory.entries.take(5).map((
+                          entry,
+                        ) {
+                          final maxValue = data.expenseByCategory.values.first;
+                          final value = maxValue == 0
+                              ? 0.0
+                              : entry.value / maxValue;
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 6),
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(child: Text(entry.key)),
+                                    Text(
+                                      moneyText(entry.value),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 6),
+                                LinearProgressIndicator(
+                                  value: value,
+                                  minHeight: 8,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      ),
                     ),
             ),
           ],

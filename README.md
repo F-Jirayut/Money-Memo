@@ -4,6 +4,8 @@
 
 ## สิ่งที่มีใน Phase 1
 
+สถานะล่าสุด: รันผ่าน Docker Compose ได้แล้ว และ build APK ได้แล้ว
+
 - Dashboard: ยอดคงเหลือ, รายรับ/รายจ่ายเดือนนี้, รายการล่าสุด 5 รายการ
 - Transaction: เพิ่ม/แก้ไข/ลบ รายรับและรายจ่าย
 - Category: หมวดหมู่เริ่มต้นภาษาไทย และเพิ่ม/แก้ไข/ลบได้
@@ -12,6 +14,29 @@
 - Monthly Summary: รายรับรวม, รายจ่ายรวม, balance สุทธิ, รายจ่ายแยกตามหมวดหมู่
 - Export CSV: columns `date,type,amount,category,wallet,note`
 - Backup / Restore: backup SQLite และ restore พร้อม confirmation
+
+## สิ่งที่เริ่มทำใน Phase 2
+
+- Dark premium theme ทั้งแอป
+- ปรับชั้น Provider/ViewModel ให้ UI เรียก action ผ่าน ViewModel แทนเรียก Repository ตรง
+- แนบรูปสลิป/ใบเสร็จในรายการรับจ่าย โดย copy เข้า app storage และ preview ในฟอร์ม
+- OCR อ่านรูปจาก Gallery เพื่อดึงข้อความและเดายอดเงินจากสลิป
+- Import CSV จากไฟล์ columns `date,type,amount,category,wallet,note`
+- Export Excel `.xlsx`
+- Export PDF พร้อมฟอนต์ไทย bundled
+- Budget รายเดือนแยกตามหมวดรายจ่าย พร้อม progress และสถานะเกินงบ
+
+## สิ่งที่เริ่มทำใน Phase 3
+
+- PIN lock: ตั้ง PIN, เปิด/ปิด lock และปลดล็อกตอนเปิดแอป
+- Biometric: เปิดใช้ fingerprint/face unlock หลังตั้ง PIN
+- Tag: จัดการ tag และติด tag กับ transaction
+- แจ้งเตือนรายจ่าย: ตั้งเวลา reminder รายวัน และทดสอบ notification ได้
+- Recurring transaction: สร้าง template รายเดือน และ generate รายการของเดือนปัจจุบัน
+- รายงานขั้นสูง: trend 6 เดือน, รายจ่ายตามหมวด และรายจ่ายตามกระเป๋า
+- Dashboard chart ขั้นสูง: แสดงกราฟรายจ่ายตามหมวดบน dashboard
+- Settings hub: รวม PIN, Tags, Recurring และ Backup / Restore
+- Backup แบบเข้ารหัส: สร้าง/restore ไฟล์ `.mmenc` ด้วยรหัสผ่าน
 
 ## ติดตั้ง Docker Desktop บน Windows แบบคร่าว ๆ
 
@@ -176,19 +201,19 @@ lib/
 ## Roadmap
 
 Phase 2:
-- OCR อ่านรูปจาก Gallery
-- แนบรูปสลิป/ใบเสร็จ
-- Import CSV
-- Export Excel
-- Export PDF
-- Budget รายเดือน
+- OCR อ่านรูปจาก Gallery [ทำแล้ว]
+- แนบรูปสลิป/ใบเสร็จ [ทำแล้ว: copy เข้า app storage และ preview]
+- Import CSV [เริ่มแล้ว]
+- Export Excel [ทำแล้ว]
+- Export PDF [ทำแล้ว]
+- Budget รายเดือน [ทำแล้ว]
 
 Phase 3:
-- PIN lock
-- Biometric
-- Tag
-- รายงานขั้นสูง
-- Recurring transaction
-- แจ้งเตือนรายจ่าย
-- Dashboard chart ขั้นสูง
-- Backup แบบเข้ารหัส
+- PIN lock [ทำแล้ว]
+- Biometric [ทำแล้ว]
+- Tag [ทำแล้ว]
+- รายงานขั้นสูง [ทำแล้ว]
+- Recurring transaction [ทำแล้ว]
+- แจ้งเตือนรายจ่าย [ทำแล้ว]
+- Dashboard chart ขั้นสูง [ทำแล้ว]
+- Backup แบบเข้ารหัส [ทำแล้ว]
